@@ -4,10 +4,11 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Plus, BookOpenCheck, AlertCircle, Database } from 'lucide-react';
+import { Plus, BookOpenCheck, AlertCircle, Database, Calendar as CalendarIcon, List as ListIcon } from 'lucide-react';
 import { LessonCard } from './components/LessonCard';
 import { AddLessonModal } from './components/AddLessonModal';
 import { Dashboard } from './components/Dashboard';
+import { CalendarView } from './components/CalendarView';
 import { Lesson, ReviewStatus, ReviewRating } from './types';
 
 const getTodayString = () => {
@@ -72,6 +73,7 @@ export default function App() {
   }, [lessons]);
   
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'agenda' | 'calendar'>('calendar');
 
   const handleStatusChange = (id: string, newStatus: ReviewStatus) => {
     setLessons((prevLessons) =>
@@ -302,9 +304,39 @@ export default function App() {
           </div>
         ) : (
           <>
-            <Dashboard lessons={lessons} />
+            <div className="flex items-center justify-end mb-6">
+              <div className="bg-white border border-slate-200 p-1 rounded-xl inline-flex shadow-sm">
+                <button
+                  onClick={() => setViewMode('agenda')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${
+                    viewMode === 'agenda' ? 'bg-slate-100 text-slate-800' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  <ListIcon className="w-4 h-4" />
+                  <span className="hidden sm:inline">Danh sách</span>
+                </button>
+                <button
+                  onClick={() => setViewMode('calendar')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${
+                    viewMode === 'calendar' ? 'bg-slate-100 text-slate-800' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  <CalendarIcon className="w-4 h-4" />
+                  <span className="hidden sm:inline">Lịch tuần</span>
+                </button>
+              </div>
+            </div>
+
+            {viewMode === 'calendar' ? (
+              <div className="mb-8">
+                <CalendarView lessons={lessons} currentDate={currentDate} onReview={handleReview} />
+              </div>
+            ) : (
+              <Dashboard lessons={lessons} />
+            )}
             
-            <div className="space-y-8">
+            {viewMode === 'agenda' && (
+              <div className="space-y-8">
               {sortedDates.map((dateStr) => {
                 const dateLessons = groupedLessons[dateStr];
                 const isActionable = dateStr <= currentDate;
@@ -338,6 +370,7 @@ export default function App() {
                 );
               })}
             </div>
+            )}
           </>
         )}
       </main>
