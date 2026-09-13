@@ -1,0 +1,6 @@
+{
+  "name": "Quản lý Ôn tập",
+  "description": "Giao diện quản lý bài học và trạng thái ôn tập đơn giản, trực quan dành cho học sinh.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
