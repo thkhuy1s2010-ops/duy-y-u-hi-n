@@ -6,6 +6,7 @@ export interface Lesson {
   studyDate: string; // ISO date string YYYY-MM-DD
   status: ReviewStatus;
   reviewDates: string[];
+  completedDates?: string[];
 }
 
 export const STATUS_CONFIG: Record<

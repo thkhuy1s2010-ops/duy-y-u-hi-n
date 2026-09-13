@@ -76,9 +76,28 @@ export default function App() {
     setLessons((prevLessons) => [newLesson, ...prevLessons]);
   };
 
+  const handleCompleteReview = (id: string) => {
+    setLessons((prevLessons) =>
+      prevLessons.map((lesson) => {
+        if (lesson.id === id) {
+          const completed = lesson.completedDates ? [...lesson.completedDates] : [];
+          if (!completed.includes(todayStr)) {
+            completed.push(todayStr);
+          }
+          return { ...lesson, completedDates: completed, status: 'da_on_tap' };
+        }
+        return lesson;
+      })
+    );
+  };
+
   const todayStr = getTodayString();
-  const todayLessons = lessons.filter(l => l.reviewDates?.includes(todayStr));
-  const otherLessons = lessons.filter(l => !l.reviewDates?.includes(todayStr));
+  const todayLessons = lessons.filter(
+    (l) => l.reviewDates?.includes(todayStr) && !l.completedDates?.includes(todayStr)
+  );
+  const otherLessons = lessons.filter(
+    (l) => !l.reviewDates?.includes(todayStr) || l.completedDates?.includes(todayStr)
+  );
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-100 selection:text-blue-900">
@@ -137,6 +156,7 @@ export default function App() {
                       lesson={lesson}
                       onStatusChange={handleStatusChange}
                       onDelete={handleDelete}
+                      onComplete={handleCompleteReview}
                     />
                   ))}
                 </div>

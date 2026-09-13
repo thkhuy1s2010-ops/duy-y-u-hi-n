@@ -6,12 +6,14 @@ interface LessonCardProps {
   lesson: Lesson;
   onStatusChange: (id: string, newStatus: ReviewStatus) => void;
   onDelete: (id: string) => void;
+  onComplete?: (id: string) => void;
 }
 
 export const LessonCard: React.FC<LessonCardProps> = ({
   lesson,
   onStatusChange,
   onDelete,
+  onComplete,
 }) => {
   const currentStatusConfig = STATUS_CONFIG[lesson.status];
 
@@ -84,6 +86,15 @@ export const LessonCard: React.FC<LessonCardProps> = ({
         </div>
 
         <div className="flex items-center gap-1">
+          {onComplete && (
+            <button
+              onClick={() => onComplete(lesson.id)}
+              className="mr-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 font-medium text-xs sm:text-sm rounded-lg transition"
+            >
+              <CheckCircle2 className="w-4 h-4" />
+              Hoàn thành
+            </button>
+          )}
           <label htmlFor={`status-select-${lesson.id}`} className="text-xs text-slate-400 mr-1">
             Đổi trạng thái:
           </label>
