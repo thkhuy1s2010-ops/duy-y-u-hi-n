@@ -1,19 +1,19 @@
 import React from 'react';
 import { Calendar, Trash2, CheckCircle2, Clock, BookOpen } from 'lucide-react';
-import { Lesson, ReviewStatus, STATUS_CONFIG } from '../types';
+import { Lesson, ReviewStatus, ReviewRating, STATUS_CONFIG } from '../types';
 
 interface LessonCardProps {
   lesson: Lesson;
   onStatusChange: (id: string, newStatus: ReviewStatus) => void;
   onDelete: (id: string) => void;
-  onComplete?: (id: string) => void;
+  onReview?: (id: string, rating: ReviewRating) => void;
 }
 
 export const LessonCard: React.FC<LessonCardProps> = ({
   lesson,
   onStatusChange,
   onDelete,
-  onComplete,
+  onReview,
 }) => {
   const currentStatusConfig = STATUS_CONFIG[lesson.status];
 
@@ -58,8 +58,18 @@ export const LessonCard: React.FC<LessonCardProps> = ({
           <div className="mt-2.5 flex flex-wrap items-center gap-y-2 gap-x-4 text-xs sm:text-sm text-slate-500">
             <div className="flex items-center">
               <Calendar className="w-4 h-4 mr-1.5 text-slate-400 shrink-0" />
-              <span>Ngày học: <strong className="font-medium text-slate-700">{formatDisplayDate(lesson.studyDate)}</strong></span>
+              <span>Gốc: <strong>{formatDisplayDate(lesson.studyDate)}</strong></span>
             </div>
+            {(lesson.nextReviewDate || lesson.interval > 0) && (
+              <div className="flex items-center text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
+                <Clock className="w-3.5 h-3.5 mr-1 shrink-0" />
+                <span>
+                  Lặp: <strong>{lesson.interval || 0} ngày</strong> 
+                  <span className="text-slate-400 font-normal mx-1">•</span> 
+                  Tiếp theo: <strong>{formatDisplayDate(lesson.nextReviewDate || lesson.studyDate)}</strong>
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -85,29 +95,47 @@ export const LessonCard: React.FC<LessonCardProps> = ({
           </span>
         </div>
 
-        <div className="flex items-center gap-1">
-          {onComplete && (
-            <button
-              onClick={() => onComplete(lesson.id)}
-              className="mr-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 font-medium text-xs sm:text-sm rounded-lg transition"
-            >
-              <CheckCircle2 className="w-4 h-4" />
-              Hoàn thành
-            </button>
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-end sm:justify-start w-full sm:w-auto">
+          {onReview && (
+            <div className="flex items-center gap-1.5 mr-0 sm:mr-2 flex-wrap">
+              <button
+                onClick={() => onReview(lesson.id, 'forgot')}
+                className="px-2.5 sm:px-3 py-1.5 bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 font-medium text-xs sm:text-sm rounded-lg transition"
+                title="Quên (Học lại)"
+              >
+                🔴 Quên
+              </button>
+              <button
+                onClick={() => onReview(lesson.id, 'good')}
+                className="px-2.5 sm:px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 font-medium text-xs sm:text-sm rounded-lg transition"
+                title="Nhớ (Tăng khoảng cách)"
+              >
+                🟡 Nhớ
+              </button>
+              <button
+                onClick={() => onReview(lesson.id, 'easy')}
+                className="px-2.5 sm:px-3 py-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 font-medium text-xs sm:text-sm rounded-lg transition"
+                title="Dễ (Nhảy cóc)"
+              >
+                🟢 Dễ
+              </button>
+            </div>
           )}
-          <label htmlFor={`status-select-${lesson.id}`} className="text-xs text-slate-400 mr-1">
-            Đổi trạng thái:
-          </label>
-          <select
-            id={`status-select-${lesson.id}`}
-            value={lesson.status}
-            onChange={(e) => onStatusChange(lesson.id, e.target.value as ReviewStatus)}
-            className="text-xs font-medium bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-          >
-            <option value="moi_hoc">Mới học</option>
-            <option value="can_on_tap">Cần ôn tập</option>
-            <option value="da_on_tap">Đã ôn tập</option>
-          </select>
+          <div className="flex items-center gap-1.5 w-full sm:w-auto mt-2 sm:mt-0 justify-end">
+            <label htmlFor={`status-select-${lesson.id}`} className="text-xs text-slate-400 hidden sm:inline-block">
+              Trạng thái:
+            </label>
+            <select
+              id={`status-select-${lesson.id}`}
+              value={lesson.status}
+              onChange={(e) => onStatusChange(lesson.id, e.target.value as ReviewStatus)}
+              className="text-xs font-medium bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+            >
+              <option value="moi_hoc">Mới học</option>
+              <option value="can_on_tap">Cần ôn tập</option>
+              <option value="da_on_tap">Đã ôn tập</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>

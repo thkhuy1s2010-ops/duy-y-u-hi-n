@@ -1,11 +1,20 @@
 export type ReviewStatus = 'moi_hoc' | 'can_on_tap' | 'da_on_tap';
+export type ReviewRating = 'forgot' | 'good' | 'easy';
 
 export interface Lesson {
   id: string;
   title: string;
   studyDate: string; // ISO date string YYYY-MM-DD
   status: ReviewStatus;
-  reviewDates: string[];
+  
+  // SM-2 Algorithm variables
+  nextReviewDate: string; // ISO date string YYYY-MM-DD
+  interval: number; // in days
+  easeFactor: number;
+  repetitions: number;
+  
+  // Backwards compatibility for old MVP format (optional to keep for safety if users have data)
+  reviewDates?: string[];
   completedDates?: string[];
 }
 
